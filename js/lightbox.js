@@ -1,167 +1,272 @@
-const DURATION = 420;
-const EASE = 'cubic-bezier(.2, .8, .2, 1)';
-const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const ms = (n) => (reduced() ? 0 : n);
+const screenshots = Array.from(
+    document.querySelectorAll(".phone img")
+);
 
-const items = [...document.querySelectorAll('.phone')].map((fig) => {
-    const img = fig.querySelector('img');
-    const caption = fig.querySelector('figcaption');
-    return { img, label: caption ? caption.textContent.trim() : 'Screenshot', btn: null };
-}).filter((i) => i.img);
+if (screenshots.length) {
+    const buttons = [];
 
-if (items.length) init();
+    screenshots.forEach((img, index) => {
+        const figure = img.closest("figure");
+        const caption =
+            figure?.querySelector("figcaption")?.textContent?.trim() || "";
 
-function init() {
-    // 1. Make every thumbnail a real button (keyboard + screen reader friendly).
-    items.forEach((item, i) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'phone-btn';
-        btn.setAttribute('aria-label', `Enlarge ${item.label} screenshot`);
-        item.img.replaceWith(btn);
-        btn.append(item.img);
-        btn.addEventListener('click', () => open(i));
-        item.btn = btn;
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "phone-btn";
+        button.setAttribute("aria-label", `Open ${caption || "screenshot"}`);
+
+        img.parentNode.insertBefore(button, img);
+        button.appendChild(img);
+
+        buttons.push({
+            button,
+            img,
+            caption,
+            index
+        });
     });
 
-    // 2. Build the viewer once.
-    const icon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
-    const lb = document.createElement('div');
-    lb.className = 'lb';
-    lb.hidden = true;
-    lb.setAttribute('role', 'dialog');
-    lb.setAttribute('aria-modal', 'true');
-    lb.setAttribute('aria-label', 'Screenshot viewer');
-    lb.innerHTML = `
-    <div class="lb-backdrop"></div>
-    <button type="button" class="lb-btn lb-close" aria-label="Close">${icon('M6 6l12 12M18 6L6 18')}</button>
-    <button type="button" class="lb-btn lb-prev" aria-label="Previous screenshot">${icon('M15 5l-7 7 7 7')}</button>
-    <button type="button" class="lb-btn lb-next" aria-label="Next screenshot">${icon('M9 5l7 7-7 7')}</button>
-    <figure class="lb-fig"><img class="lb-img" alt=""><figcaption class="lb-cap"></figcaption></figure>`;
-    document.body.append(lb);
+    const lightbox = document.createElement("div");
 
-    const $ = (s) => lb.querySelector(s);
-    const backdrop = $('.lb-backdrop');
-    const fig = $('.lb-fig');
-    const big = $('.lb-img');
-    const cap = $('.lb-cap');
-    const closeBtn = $('.lb-close');
-    const prevBtn = $('.lb-prev');
-    const nextBtn = $('.lb-next');
-    const controls = [closeBtn, prevBtn, nextBtn];
-    if (items.length < 2) { prevBtn.hidden = true; nextBtn.hidden = true; }
+    lightbox.className = "lightbox";
+    lightbox.hidden = true;
 
-    const state = { open: false, busy: false, index: 0, opener: null };
+    lightbox.innerHTML = `
+    <div class="lightbox-backdrop"></div>
 
-    const flipTransform = (from, to) => {
-        const s = from.width / to.width;
-        return `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${s})`;
-    };
+    <button
+      type="button"
+      class="lightbox-close"
+      aria-label="Close screenshot"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18"></path>
+      </svg>
+    </button>
 
-    function show(i) {
-        const { img, label } = items[i];
-        big.src = img.dataset.full || img.currentSrc || img.src; // optional: data-full="hi-res.jpg"
-        big.alt = img.alt;
-        cap.textContent = label;
+    <button
+      type="button"
+      class="lightbox-prev"
+      aria-label="Previous screenshot"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+    </button>
+
+    <figure class="lightbox-content">
+      <img class="lightbox-image" alt="">
+      <figcaption class="lightbox-caption"></figcaption>
+    </figure>
+
+    <button
+      type="button"
+      class="lightbox-next"
+      aria-label="Next screenshot"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 18l6-6-6-6"></path>
+      </svg>
+    </button>
+  `;
+
+    document.body.appendChild(lightbox);
+
+    const backdrop = lightbox.querySelector(".lightbox-backdrop");
+    const content = lightbox.querySelector(".lightbox-content");
+    const image = lightbox.querySelector(".lightbox-image");
+    const caption = lightbox.querySelector(".lightbox-caption");
+    const close = lightbox.querySelector(".lightbox-close");
+    const prev = lightbox.querySelector(".lightbox-prev");
+    const next = lightbox.querySelector(".lightbox-next");
+
+    let currentIndex = 0;
+    let previousButton = null;
+
+    const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    );
+
+    function showImage(index) {
+        currentIndex =
+            (index + buttons.length) % buttons.length;
+
+        const item = buttons[currentIndex];
+
+        image.src = item.img.currentSrc || item.img.src;
+        image.alt = item.img.alt || item.caption;
+        caption.textContent = item.caption;
+
+        prev.hidden = buttons.length <= 1;
+        next.hidden = buttons.length <= 1;
     }
 
-    async function open(i) {
-        if (state.open) return;
-        state.open = true;
-        state.index = i;
-        state.opener = document.activeElement;
+    function openLightbox(index) {
+        previousButton = buttons[index].button;
 
-        const from = items[i].img.getBoundingClientRect();
-        const sw = window.innerWidth - document.documentElement.clientWidth;
-        document.documentElement.classList.add('lb-lock');
-        if (sw > 0) document.documentElement.style.paddingRight = `${sw}px`;
+        showImage(index);
 
-        show(i);
-        lb.hidden = false;
-        [...document.body.children].forEach((el) => { if (el !== lb) el.inert = true; });
-        items[i].btn.classList.add('is-lifted');
-        const to = big.getBoundingClientRect();
+        lightbox.hidden = false;
+        document.documentElement.classList.add("lightbox-open");
 
-        state.busy = true;
-        controls.forEach((c) => c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms(250), delay: ms(150), fill: 'backwards' }));
-        cap.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms(250), delay: ms(200), fill: 'backwards' });
-        backdrop.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms(300) });
-        await big.animate(
-            [{ transformOrigin: 'top left', transform: flipTransform(from, to) }, { transformOrigin: 'top left', transform: 'none' }],
-            { duration: ms(DURATION), easing: EASE },
-        ).finished;
-        state.busy = false;
-        closeBtn.focus({ preventScroll: true });
+        previousButton.classList.add("is-active");
+
+        if (reducedMotion.matches) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            lightbox.animate(
+                [
+                    { opacity: 0 },
+                    { opacity: 1 }
+                ],
+                {
+                    duration: 220,
+                    easing: "ease-out",
+                    fill: "forwards"
+                }
+            );
+
+            image.animate(
+                [
+                    {
+                        opacity: 0,
+                        transform: "scale(.92)"
+                    },
+                    {
+                        opacity: 1,
+                        transform: "scale(1)"
+                    }
+                ],
+                {
+                    duration: 320,
+                    easing: "cubic-bezier(.2,.8,.2,1)",
+                    fill: "forwards"
+                }
+            );
+        });
+
+        close.focus();
     }
 
-    async function close() {
-        if (!state.open || state.busy) return;
-        state.busy = true;
-        const item = items[state.index];
-        item.btn.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
-        const from = big.getBoundingClientRect();
-        const to = item.img.getBoundingClientRect();
-        const fade = { duration: ms(250), fill: 'forwards' };
-        controls.forEach((c) => c.animate([{ opacity: 1 }, { opacity: 0 }], fade));
-        cap.animate([{ opacity: 1 }, { opacity: 0 }], fade);
-        backdrop.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms(DURATION), fill: 'forwards' });
-        await big.animate(
-            [{ transformOrigin: 'top left', transform: 'none' }, { transformOrigin: 'top left', transform: flipTransform(to, from) }],
-            { duration: ms(DURATION), easing: EASE, fill: 'forwards' },
-        ).finished;
+    function closeLightbox() {
+        if (lightbox.hidden) {
+            return;
+        }
 
-        lb.hidden = true;
-        lb.getAnimations({ subtree: true }).forEach((a) => a.cancel());
-        item.btn.classList.remove('is-lifted');
-        [...document.body.children].forEach((el) => { el.inert = false; });
-        document.documentElement.classList.remove('lb-lock');
-        document.documentElement.style.paddingRight = '';
-        state.open = false;
-        state.busy = false;
-        (state.opener && state.opener.focus ? state.opener : item.btn).focus({ preventScroll: true });
+        if (reducedMotion.matches) {
+            finishClose();
+            return;
+        }
+
+        const animation = lightbox.animate(
+            [
+                { opacity: 1 },
+                { opacity: 0 }
+            ],
+            {
+                duration: 180,
+                easing: "ease-in",
+                fill: "forwards"
+            }
+        );
+
+        animation.finished
+            .catch(() => { })
+            .finally(() => {
+                finishClose();
+            });
     }
 
-    async function go(dir) {
-        if (!state.open || state.busy || items.length < 2) return;
-        state.busy = true;
-        const next = (state.index + dir + items.length) % items.length;
-        items[state.index].btn.classList.remove('is-lifted');
-        items[next].btn.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
-        items[next].btn.classList.add('is-lifted');
+    function finishClose() {
+        lightbox.hidden = true;
 
-        const out = fig.animate(
-            [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${-dir * 18}px) scale(.98)` }],
-            { duration: ms(130), easing: 'ease-in', fill: 'forwards' });
-        await out.finished;
-        show(next);
-        state.index = next;
-        const inn = fig.animate(
-            [{ opacity: 0, transform: `translateX(${dir * 18}px) scale(.98)` }, { opacity: 1, transform: 'none' }],
-            { duration: ms(200), easing: 'ease-out' });
-        out.cancel();
-        await inn.finished;
-        state.busy = false;
+        document.documentElement.classList.remove(
+            "lightbox-open"
+        );
+
+        image.src = "";
+
+        if (previousButton) {
+            previousButton.classList.remove("is-active");
+            previousButton.focus();
+        }
+
+        previousButton = null;
     }
 
-    prevBtn.addEventListener('click', () => go(-1));
-    nextBtn.addEventListener('click', () => go(1));
-    closeBtn.addEventListener('click', close);
-    lb.addEventListener('click', (e) => { if (!e.target.closest('.lb-btn, .lb-img')) close(); });
+    function showPrevious() {
+        showImage(currentIndex - 1);
+    }
 
-    document.addEventListener('keydown', (e) => {
-        if (!state.open) return;
-        if (e.key === 'Escape') close();
-        else if (e.key === 'ArrowLeft') go(-1);
-        else if (e.key === 'ArrowRight') go(1);
+    function showNext() {
+        showImage(currentIndex + 1);
+    }
+
+    buttons.forEach((item, index) => {
+        item.button.addEventListener("click", () => {
+            openLightbox(index);
+        });
     });
 
-    // Swipe left/right on touch screens.
-    let startX = null;
-    lb.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
-    lb.addEventListener('touchend', (e) => {
-        if (startX == null) return;
-        const dx = e.changedTouches[0].clientX - startX;
-        startX = null;
-        if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-    }, { passive: true });
+    close.addEventListener("click", closeLightbox);
+    backdrop.addEventListener("click", closeLightbox);
+    prev.addEventListener("click", showPrevious);
+    next.addEventListener("click", showNext);
+
+    document.addEventListener("keydown", event => {
+        if (lightbox.hidden) {
+            return;
+        }
+
+        if (event.key === "Escape") {
+            closeLightbox();
+        }
+
+        if (event.key === "ArrowLeft") {
+            showPrevious();
+        }
+
+        if (event.key === "ArrowRight") {
+            showNext();
+        }
+    });
+
+    // Swipe support on mobile
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    image.addEventListener("touchstart", event => {
+        const touch = event.changedTouches[0];
+
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+    }, {
+        passive: true
+    });
+
+    image.addEventListener("touchend", event => {
+        const touch = event.changedTouches[0];
+
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+
+        if (Math.abs(dx) < 50) {
+            return;
+        }
+
+        if (Math.abs(dx) < Math.abs(dy)) {
+            return;
+        }
+
+        if (dx > 0) {
+            showPrevious();
+        } else {
+            showNext();
+        }
+    }, {
+        passive: true
+    });
 }
