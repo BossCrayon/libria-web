@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Libria — A Quiet Place for Novels</title>
+  <meta name="description" content="Libria is a fast, distraction-free novel reader built around reading, offline access, personal libraries, discovery, and community.">
+  <meta name="theme-color" content="#0B0B0F">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Open Graph. Replace the relative og:image/og:url with absolute URLs once the site has a domain. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Libria">
+  <meta property="og:title" content="Libria — A Quiet Place for Novels">
+  <meta property="og:description" content="A fast, distraction-free novel reader built around reading, offline access, personal libraries, discovery, and community.">
+  <meta property="og:image" content="assets/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="modulepreload" href="js/main.js">
+</head>
+<body id="top">
+  <a class="skip" href="#download">Skip to download</a>
+
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="wordmark" href="#top" aria-label="Libria, home">Libria</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <a href="#top">Home</a>
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="#versions">Releases</a>
+        <a href="https://github.com/BossCrayon/libria-web" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <h1 id="hero-title" class="hero-wordmark">Libria</h1>
+          <p class="hero-tagline">A quiet place for novels.</p>
+          <p class="hero-lede">A fast, distraction-free reading experience built for people who simply want to read.</p>
+          <div class="actions hero-actions">
+            <!-- href is replaced with the latest APK URL by js/main.js; this fallback always works -->
+            <a id="hero-download" class="btn btn--primary btn--lg" href="https://github.com/BossCrayon/libria-web/releases/latest" rel="noopener">Download Libria</a>
+            <a class="btn btn--ghost btn--lg" href="https://github.com/BossCrayon/libria-web" rel="noopener">View GitHub</a>
+          </div>
+          <p id="hero-meta" class="hero-meta" aria-live="polite"></p>
+        </div>
+
+        <svg class="hero-art" viewBox="0 0 360 440" role="img" aria-label="An open page of text lit by a soft violet light" focusable="false">
+          <defs>
+            <radialGradient id="lamp" cx="30%" cy="12%" r="75%">
+              <stop offset="0" stop-color="#8B7BF2" stop-opacity=".30"/>
+              <stop offset="1" stop-color="#8B7BF2" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset=".45" stop-color="#0B0B0F" stop-opacity="0"/>
+              <stop offset="1" stop-color="#0B0B0F" stop-opacity="1"/>
+            </linearGradient>
+          </defs>
+          <rect x="40" y="30" width="280" height="390" rx="4" fill="#15151C" stroke="#252530"/>
+          <rect x="40" y="30" width="280" height="390" rx="4" fill="url(#lamp)"/>
+          <rect x="268" y="30" width="16" height="64" fill="#6D5AE0"/>
+          <path d="M268 94l8 -8 8 8z" fill="#0B0B0F"/>
+          <g fill="#2B2B38">
+            <rect x="72" y="76" width="130" height="9" rx="2"/>
+            <rect x="72" y="118" width="216" height="5" rx="2.5"/>
+            <rect x="72" y="134" width="206" height="5" rx="2.5"/>
+            <rect x="72" y="150" width="216" height="5" rx="2.5"/>
+            <rect x="72" y="166" width="150" height="5" rx="2.5"/>
+            <rect x="72" y="198" width="216" height="5" rx="2.5"/>
+            <rect x="72" y="214" width="198" height="5" rx="2.5"/>
+            <rect x="72" y="230" width="216" height="5" rx="2.5"/>
+            <rect x="72" y="246" width="212" height="5" rx="2.5"/>
+            <rect x="72" y="262" width="120" height="5" rx="2.5"/>
+            <rect x="72" y="294" width="216" height="5" rx="2.5"/>
+            <rect x="72" y="310" width="204" height="5" rx="2.5"/>
+            <rect x="72" y="326" width="216" height="5" rx="2.5"/>
+            <rect x="72" y="342" width="170" height="5" rx="2.5"/>
+            <rect x="72" y="358" width="216" height="5" rx="2.5"/>
+          </g>
+          <rect x="40" y="30" width="280" height="392" fill="url(#fade)"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 2. Latest release -->
+    <section id="download" class="section section--release" aria-label="Latest release">
+      <div class="wrap">
+        <div id="latest-release" aria-live="polite" aria-busy="true">
+          <noscript>
+            <div class="state">
+              <p class="state-title">JavaScript is needed to show the latest version here.</p>
+              <div class="actions">
+                <a class="btn btn--primary" href="https://github.com/BossCrayon/libria-web/releases/latest" rel="noopener">Download from GitHub</a>
+              </div>
+            </div>
+          </noscript>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Features -->
+    <section id="features" class="section" aria-labelledby="features-title">
+      <div class="wrap">
+        <h2 id="features-title" class="section-title">Made for reading, and nothing else</h2>
+        <ul class="features">
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/></svg>
+            <h3>Reader First</h3>
+            <p>A clean reading experience designed around the novel itself.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+            <h3>Offline Reading</h3>
+            <p>Keep your novels available even without an internet connection.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3v18"/><path d="M10 3v18"/><path d="M15.5 4.5l4 16.5"/></svg>
+            <h3>Personal Library</h3>
+            <p>Organize and track the novels you're reading.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19L8 6l5 13"/><path d="M5 14h6"/><path d="M15 19l3.5-8 3.5 8"/><path d="M16.5 16h4"/></svg>
+            <h3>Custom Reader</h3>
+            <p>Adjust typography, spacing, themes, and reading preferences.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M16 8l-2 6-6 2 2-6z"/></svg>
+            <h3>Discovery</h3>
+            <p>Find new novels through supported sources.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z"/></svg>
+            <h3>Community</h3>
+            <p>Discuss novels and interact with other readers.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>
+            <h3>No Ads</h3>
+            <p>Libria does not interrupt reading with advertisements.</p>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>
+            <h3>No Reading Paywalls</h3>
+            <p>Reading should not be artificially restricted by energy systems or chapter locks.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4. App preview. To use real screenshots, replace the files in assets/screenshots/ (keep the names, or edit the src). -->
+    <section id="preview" class="section section--alt" aria-labelledby="preview-title">
+      <div class="wrap">
+        <h2 id="preview-title" class="section-title">A look inside</h2>
+        <p class="section-lede">Placeholder artwork for now. Real screenshots will replace it.</p>
+        <ul class="shots">
+          <li><figure class="phone"><img src="assets/screenshots/home.svg" width="270" height="585" loading="lazy" decoding="async" alt="Home screen (placeholder)"><figcaption>Home</figcaption></figure></li>
+          <li><figure class="phone"><img src="assets/screenshots/library.svg" width="270" height="585" loading="lazy" decoding="async" alt="Library screen (placeholder)"><figcaption>Library</figcaption></figure></li>
+          <li><figure class="phone"><img src="assets/screenshots/discover.svg" width="270" height="585" loading="lazy" decoding="async" alt="Discover screen (placeholder)"><figcaption>Discover</figcaption></figure></li>
+          <li><figure class="phone"><img src="assets/screenshots/reader.svg" width="270" height="585" loading="lazy" decoding="async" alt="Reader screen (placeholder)"><figcaption>Reader</figcaption></figure></li>
+          <li><figure class="phone"><img src="assets/screenshots/community.svg" width="270" height="585" loading="lazy" decoding="async" alt="Community screen (placeholder)"><figcaption>Community</figcaption></figure></li>
+          <li><figure class="phone"><img src="assets/screenshots/settings.svg" width="270" height="585" loading="lazy" decoding="async" alt="Settings screen (placeholder)"><figcaption>Settings</figcaption></figure></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. Previous versions -->
+    <section id="versions" class="section" aria-labelledby="versions-title">
+      <div class="wrap wrap--narrow">
+        <h2 id="versions-title" class="section-title">Previous versions</h2>
+        <p class="section-lede">Every earlier release stays available to download.</p>
+        <div id="previous-versions" class="versions" aria-live="polite" aria-busy="true"></div>
+      </div>
+    </section>
+
+    <!-- 6. About -->
+    <section id="about" class="section section--alt" aria-labelledby="about-title">
+      <div class="wrap wrap--narrow">
+        <h2 id="about-title" class="about-statement">Libria is built around a simple idea: reading should feel like reading.</h2>
+        <dl class="about-list">
+          <div><dt>Reading</dt><dd>Typography and themes you control, with nothing competing for attention.</dd></div>
+          <div><dt>Personal libraries</dt><dd>Your novels and your progress, kept in one place.</dd></div>
+          <div><dt>Offline access</dt><dd>Read wherever you are, connected or not.</dd></div>
+          <div><dt>Discovery</dt><dd>Find novels from supported sources.</dd></div>
+          <div><dt>Community</dt><dd>Talk about what you read with other readers.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- 7. GitHub -->
+    <section id="github" class="section" aria-labelledby="github-title">
+      <div class="wrap wrap--narrow github">
+        <div>
+          <h2 id="github-title" class="section-title">Every release, on GitHub.</h2>
+          <p class="section-lede">Follow releases, grab any version, and see what's changed. You don't need a GitHub account to download Libria.</p>
+          <p class="github-links">
+            <a href="https://github.com/BossCrayon/libria-web" rel="noopener">Repository</a>
+            <a href="https://github.com/BossCrayon/libria-web/releases" rel="noopener">Releases</a>
+          </p>
+        </div>
+        <a class="btn btn--ghost btn--lg" href="https://github.com/BossCrayon/libria-web" rel="noopener">View on GitHub</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- 8. Footer -->
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="footer-brand">Libria</p>
+        <p class="muted">A quiet place for novels.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="#top">Home</a>
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="#versions">Releases</a>
+        <a href="https://github.com/BossCrayon/libria-web" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+    <div class="wrap"><p class="copyright muted">© 2026 Libria</p></div>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
