@@ -12,7 +12,8 @@ export class ReleaseServiceError extends Error {
   }
 }
 
-const CACHE_PREFIX = 'libria:releases:v1:';
+const CACHE_PREFIX = 'libria:releases:v2:';
+const NO_APK_CACHE_TTL_MS = 60 * 1000;
 
 /* ---------- Pure formatting helpers (exported for tests) ---------- */
 
@@ -191,7 +192,13 @@ export class GitHubReleaseService {
     }
   }
 
-  _fresh(entry) { return this.now() - entry.t < this.cacheTtlMs; }
+  _fresh(entry) {
+    const latest = Array.isArray(entry.data) ? entry.data[0] : entry.data;
+    const ttl = latest && !latest.apk
+      ? Math.min(this.cacheTtlMs, NO_APK_CACHE_TTL_MS)
+      : this.cacheTtlMs;
+    return this.now() - entry.t < ttl;
+  }
 
   _readCache(key) {
     try {

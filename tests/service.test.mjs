@@ -28,6 +28,11 @@ test('extractApkAsset prefers libria-named release APK, ignores non-APK', () => 
   const apk = extractApkAsset(RELEASES[1].assets);
   assert.equal(apk.name, 'libria-1.5.0.apk');
   assert.equal(apk.url, 'https://github.com/BossCrayon/libria-web/releases/download/x/libria-1.5.0.apk');
+  assert.equal(extractApkAsset([{
+    name: 'app-release.apk',
+    browser_download_url: 'https://github.com/BossCrayon/libria-web/releases/download/2.0.0/app-release.apk',
+    state: 'uploaded',
+  }]).name, 'app-release.apk');
   assert.equal(extractApkAsset([{ name: 'a.txt' }]), null);
   assert.equal(extractApkAsset([]), null);
   assert.equal(extractApkAsset(undefined), null);
@@ -63,6 +68,34 @@ test('caching: second call makes no request; stale cache used on failure', async
   t = 99 * 60 * 1000;
   svc.fetchImpl = async () => { throw new Error('offline'); };
   assert.equal((await svc.fetchAllReleases()).length, 3);
+});
+
+test('a release cached without an APK refreshes after one minute', async () => {
+  const storage = memStore();
+  const releaseWithoutApk = { ...RELEASES[1], assets: [] };
+  const releaseWithApk = {
+    ...RELEASES[1],
+    assets: [{
+      name: 'app-release.apk',
+      browser_download_url: 'https://github.com/BossCrayon/libria-web/releases/download/2.0.0/app-release.apk',
+      state: 'uploaded',
+      size: 125002568,
+    }],
+  };
+  let t = 0;
+  let response = [releaseWithoutApk];
+  let calls = 0;
+  const svc = mk(async () => {
+    calls++;
+    return { ok: true, status: 200, json: async () => response };
+  }, { storage, now: () => t });
+
+  assert.equal((await svc.fetchAllReleases())[0].apk, null);
+  response = [releaseWithApk];
+  t = 60 * 1000;
+
+  assert.equal((await svc.fetchAllReleases())[0].apk.name, 'app-release.apk');
+  assert.equal(calls, 2);
 });
 
 test('errors are typed', async () => {
